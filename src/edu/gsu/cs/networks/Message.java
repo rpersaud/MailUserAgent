@@ -8,8 +8,6 @@ import java.io.*;
 import java.util.*;
 import java.text.*;
 
-/* $Id: Message.java,v 1.5 1999/07/22 12:10:57 kangasha Exp $ */
-
 /**
  * Mail message.
  *
