@@ -1,5 +1,14 @@
 /**
- * 
+ * The MailClient class provides the user interface and calls the other classes as needed.
+ * When you press Send, the MailClient class constructs a Message class object to hold the mail message.
+ * The Message object holds the actual message headers and body. Then the MailClient object builds the
+ * SMTP envelope using the Envelope class. This class holds the SMTP sender and recipient information,
+ * the SMTP server of the recipient's domain, and the Message object. Then the MailClient object creates
+ * the SMTPConnection object which opens a connection to the SMTP server and the MailClient object sends
+ * the message over the connection. The sending of the mail happens in three phases:
+ * The MailClient object creates the SMTPConnection object and opens the connection to the SMTP server.
+ * The MailClient object sends the message using the function SMTPConnection.send().
+ * The MailClient object closes the SMTP connection.
  */
 package edu.gsu.cs.networks;
 
@@ -15,7 +24,7 @@ import java.awt.event.*;
  */
 public class MailClient extends Frame
 {
-    /* The stuff for the GUI. */
+	/* The stuff for the GUI. */
     private Button btSend = new Button("Send");
     private Button btClear = new Button("Clear");
     private Button btQuit = new Button("Quit");
@@ -39,8 +48,6 @@ public class MailClient extends Frame
      * name that can identify your username.
      */
     private Checkbox usrName = new Checkbox("Auto Generate?"); 
-    
-    
     private Label subjectLabel = new Label("Subject:");
     private TextField subjectField = new TextField("", 40);
     private Label messageLabel = new Label("Message:");
@@ -50,154 +57,155 @@ public class MailClient extends Frame
      * Create a new MailClient window with fields for entering all
      * the relevant information (From, To, Subject, and message).
      */
-    public MailClient() {
-	super("Java Mailclient");
+    public MailClient()
+    {
+		super("Java Mailclient");
+		
+		/* Create panels for holding the fields.
+		 * To make it look nice, create an extra panel for holding all the child panels.
+		 */
+		Panel serverPanel = new Panel(new BorderLayout());
+		Panel fromPanel = new Panel(new BorderLayout());
+		Panel toPanel = new Panel(new BorderLayout());
+	        
+	    // add ccPanel and usrPanel to GUI
+	    Panel ccPanel = new Panel(new BorderLayout());
+	    Panel usrPanel = new Panel(new BorderLayout());
+	    Panel subjectPanel = new Panel(new BorderLayout());
+		Panel messagePanel = new Panel(new BorderLayout());
+		serverPanel.add(serverLabel, BorderLayout.WEST);
+		serverPanel.add(serverField, BorderLayout.CENTER);
+		fromPanel.add(fromLabel, BorderLayout.WEST);
+		fromPanel.add(fromField, BorderLayout.CENTER);
+		toPanel.add(toLabel, BorderLayout.WEST);
+		toPanel.add(toField, BorderLayout.CENTER);
+	        
+	    // Add ccLabel, ccField, & usrName to Panels
+	    ccPanel.add(ccLabel, BorderLayout.WEST);
+		ccPanel.add(ccField, BorderLayout.CENTER);
+	    usrPanel.add(usrName, BorderLayout.WEST);
+	        
+	    subjectPanel.add(subjectLabel, BorderLayout.WEST);
+		subjectPanel.add(subjectField, BorderLayout.CENTER);
+		messagePanel.add(messageLabel, BorderLayout.NORTH);	
+		messagePanel.add(messageText, BorderLayout.CENTER);
+		Panel fieldPanel = new Panel(new GridLayout(0, 1));
+		fieldPanel.add(serverPanel);
+		fieldPanel.add(fromPanel);
+		fieldPanel.add(toPanel);
+	    fieldPanel.add(ccPanel);
+	    fieldPanel.add(usrPanel);
+	    fieldPanel.add(subjectPanel);
 	
-	/* Create panels for holding the fields. To make it look nice,
-	   create an extra panel for holding all the child panels. */
-	Panel serverPanel = new Panel(new BorderLayout());
-	Panel fromPanel = new Panel(new BorderLayout());
-	Panel toPanel = new Panel(new BorderLayout());
-        
-        // add ccPanel and usrPanel to GUI
-        Panel ccPanel = new Panel(new BorderLayout());
-        Panel usrPanel = new Panel(new BorderLayout());
-        
-        Panel subjectPanel = new Panel(new BorderLayout());
-	Panel messagePanel = new Panel(new BorderLayout());
-	serverPanel.add(serverLabel, BorderLayout.WEST);
-	serverPanel.add(serverField, BorderLayout.CENTER);
-	fromPanel.add(fromLabel, BorderLayout.WEST);
-	fromPanel.add(fromField, BorderLayout.CENTER);
-	toPanel.add(toLabel, BorderLayout.WEST);
-	toPanel.add(toField, BorderLayout.CENTER);
-        
-        // Add ccLabel, ccField, & usrName to Panels
-        ccPanel.add(ccLabel, BorderLayout.WEST);
-	ccPanel.add(ccField, BorderLayout.CENTER);
-        usrPanel.add(usrName, BorderLayout.WEST);
-        
-        subjectPanel.add(subjectLabel, BorderLayout.WEST);
-	subjectPanel.add(subjectField, BorderLayout.CENTER);
-	messagePanel.add(messageLabel, BorderLayout.NORTH);	
-	messagePanel.add(messageText, BorderLayout.CENTER);
-	Panel fieldPanel = new Panel(new GridLayout(0, 1));
-	fieldPanel.add(serverPanel);
-	fieldPanel.add(fromPanel);
-	fieldPanel.add(toPanel);
-        fieldPanel.add(ccPanel);
-        fieldPanel.add(usrPanel);
-        fieldPanel.add(subjectPanel);
-
-	/* Create a panel for the buttons and add listeners to the
-	   buttons. */
-	Panel buttonPanel = new Panel(new GridLayout(1, 0));
-	btSend.addActionListener(new SendListener());
-	btClear.addActionListener(new ClearListener());
-	btQuit.addActionListener(new QuitListener());
-	buttonPanel.add(btSend);
-	buttonPanel.add(btClear);
-	buttonPanel.add(btQuit);
-	
-	/* Add, pack, and show. */
-	add(fieldPanel, BorderLayout.NORTH);
-	add(messagePanel, BorderLayout.CENTER);
-	add(buttonPanel, BorderLayout.SOUTH);
-	pack();
-	show();
+		/* Create a panel for the buttons and add listeners to the
+		   buttons. */
+		Panel buttonPanel = new Panel(new GridLayout(1, 0));
+		btSend.addActionListener(new SendListener());
+		btClear.addActionListener(new ClearListener());
+		btQuit.addActionListener(new QuitListener());
+		buttonPanel.add(btSend);
+		buttonPanel.add(btClear);
+		buttonPanel.add(btQuit);
+		
+		/* Add, pack, and show. */
+		add(fieldPanel, BorderLayout.NORTH);
+		add(messagePanel, BorderLayout.CENTER);
+		add(buttonPanel, BorderLayout.SOUTH);
+		pack();
+		show();
     }
 
-    static public void main(String argv[]) {
-	new MailClient();
+    static public void main(String argv[])
+    {
+    	new MailClient();
     }
 
     /* Handler for the Send-button. */
-    class SendListener implements ActionListener {
-	public void actionPerformed(ActionEvent event) { 
-	    System.out.println("Sending mail");
-	   Envelope envelope;  // TRY IT HERE 
-	    /* Check that we have the local mailserver */
-	    if ((serverField.getText()).equals("")) {
-		System.out.println("Need name of local mailserver!");
-		return;
-	    }
-
-	    /* Check that we have the sender and recipient.
-	    * Also, still send if fromField is blank IFF usrName checkbox
-            * is checked.
-            */ 
-           if((fromField.getText()).equals("") && !usrName.getState()) {
-		System.out.println("Need sender!");
-		return;
-	    }
-	    if((toField.getText()).equals("")) {
-		System.out.println("Need recipient!");
-		return;
-	    }
-
-           if(usrName.getState())
-               System.out.println("Checked.");
-	    /* Create the message */
-           
+    class SendListener implements ActionListener
+    {
+		public void actionPerformed(ActionEvent event)
+		{ 
+			System.out.println("Sending mail");
+		    Envelope envelope;  // TRY IT HERE 
+		    
+		    /* Check that we have the local mailserver */
+		    if ((serverField.getText()).equals("")) {
+		    	System.out.println("Need name of local mailserver!");
+		    	return;
+		    }
+	
+		    /* Check that we have the sender and recipient.
+		     * Also, still send if fromField is blank IFF usrName checkbox
+	         * is checked.
+	         */ 
+	        if ((fromField.getText()).equals("") && !usrName.getState()) {
+	        	System.out.println("Need sender!");
+	        	return;
+		    }
+		    if ((toField.getText()).equals("")) {
+		    	System.out.println("Need recipient!");
+		    	return;
+		    }
+		    if (usrName.getState()) {
+	               System.out.println("Checked.");
+		    }
+		    /* Create the message */
            // Modified the message format to include Extra fields
-           try {
-           Message mailMessage = new Message(fromField.getText(), 
-					      toField.getText(),
-					      ccField.getText(),
-					      subjectField.getText(), 
-					      messageText.getText(),
-                          usrName.getState(),
-                                           serverField.getText());
-           
-	    /* Check that the message is valid, i.e., sender and
-	       recipient addresses look ok. */
-	    if(!mailMessage.isValid()) {
-		return;
-	    }
-
-	    /* Create the envelope, open the connection and try to send
-	       the message. */
-	    try {
-		envelope = new Envelope(mailMessage, 
-						 serverField.getText());
-	    } catch (UnknownHostException e) {
-		/* If there is an error, do not go further */
-		return;
-	    }
-           
-           }
-           catch(IOException e) {
-               return;
-           }
-           
-           
-	    try {
-		SMTPConnection connection = new SMTPConnection(envelope);
-		connection.send(envelope);
-		connection.close();
-	    } catch (IOException error) {
-		System.out.println("Sending failed: " + error);
-		return;
-	    }
-	    System.out.println("Mail sent succesfully!");
-	}
+		    try {
+		    	Message mailMessage = new Message(fromField.getText(), 
+		    			toField.getText(),
+		    			ccField.getText(),
+		    			subjectField.getText(), 
+		    			messageText.getText(),
+		    			usrName.getState(),
+		    			serverField.getText());
+	           
+		    	/* Check that the message is valid, i.e., sender and recipient addresses look ok. */
+		    	if (!mailMessage.isValid()) {
+		    		return;
+		    	}
+	
+		    	/* Create the envelope, open the connection and try to send the message. */
+		    	try {
+		    		envelope = new Envelope(mailMessage, serverField.getText());
+		    	} catch (UnknownHostException e) {
+		    		/* If there is an error, do not go further */
+		    		return;
+		    	}
+		    } catch (IOException e) {
+		    	return;
+		    }
+			try {
+				SMTPConnection connection = new SMTPConnection(envelope);
+				connection.send(envelope);
+				connection.close();
+			} catch (IOException error) {
+				System.out.println("Sending failed: " + error);
+				return;
+			}
+			System.out.println("Mail sent succesfully!");
+		}
     }
 
     /* Clear the fields in the GUI. */
-    class ClearListener implements ActionListener {
-	public void actionPerformed(ActionEvent e) {
-	    System.out.println("Clearing fields");
-	    fromField.setText("");
-	    toField.setText("");
-	    subjectField.setText("");
-	    messageText.setText("");
-	}
+    class ClearListener implements ActionListener
+    {
+		public void actionPerformed(ActionEvent e)
+		{
+		    System.out.println("Clearing fields");
+		    fromField.setText("");
+		    toField.setText("");
+		    subjectField.setText("");
+		    messageText.setText("");
+		}
     }
 
     /* Quit. */
-    class QuitListener implements ActionListener {
-	public void actionPerformed(ActionEvent e) {
-	    System.exit(0);
-	}
+    class QuitListener implements ActionListener
+    {
+		public void actionPerformed(ActionEvent e)
+		{
+		    System.exit(0);
+		}
     }
 }
