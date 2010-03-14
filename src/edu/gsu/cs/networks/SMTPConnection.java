@@ -95,7 +95,7 @@ public class SMTPConnection
     	sendCommand("MAIL FROM:<" + envelope.Sender + ">", 250);
     	sendCommand("RCPT TO:<" + envelope.Recipient + ">", 250);
     	sendCommand("DATA",354);
-    	sendCommand(envelope.Message.Body + CRLF + ".",250);
+    	sendCommand(envelope.Message + CRLF + ".",250);
     }
 
     /* Send an SMTP command to the server.
