@@ -16,22 +16,24 @@ import java.io.*;
 import java.net.*;
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.border.*;
 
 /**
  * A simple mail client with a GUI for sending mail.
  *
  * @author Jussi Kangasharju
  */
-public class MailClient extends Frame
+public class MailClient extends JFrame
 {
 	/* The stuff for the GUI. */
     private Button btSend = new Button("Send");
     private Button btClear = new Button("Clear");
     private Button btQuit = new Button("Quit");
-    private Label serverLabel = new Label("Local mailserver:");
-    private TextField serverField = new TextField("", 40);
-    private Label fromLabel = new Label("From:");
-    private TextField fromField = new TextField("", 40);
+    private JLabel serverLabel = new JLabel("Local mailserver:");
+    private JTextField serverField = new JTextField("", 40);
+    private JLabel fromLabel = new JLabel("From:");
+    private JTextField fromField = new JTextField("", 40);
     private Label toLabel = new Label("To:"); 
     private TextField toField = new TextField("", 40);
     
@@ -53,53 +55,90 @@ public class MailClient extends Frame
     private Label messageLabel = new Label("Message:");
     private TextArea messageText = new TextArea(10, 40);
 
+    private JTextField[] fields;
+    
     /**
      * Create a new MailClient window with fields for entering all
      * the relevant information (From, To, Subject, and message).
      */
-    public MailClient()
+    public MailClient(String[] labels, int[] widths)
     {
 		super("Java Mailclient");
+    	this.setLayout(new BorderLayout());
+
+    	JPanel labelPanel = new JPanel(new GridLayout(labels.length, 1));
+	    JPanel fieldPanel = new JPanel(new GridLayout(labels.length, 1));
+	    add(labelPanel, BorderLayout.WEST);
+	    add(fieldPanel, BorderLayout.CENTER);
+	    
+	    fields = new JTextField[labels.length];
+	    for (int i = 0; i < labels.length; i += 1) {
+	    	fields[i] = new JTextField();
+	    	fields[i].setColumns(widths[i]);
+	   
+	 		JLabel lab = new JLabel(labels[i], JLabel.RIGHT);
+			lab.setLabelFor(fields[i]);
+			labelPanel.add(lab);
+
+			JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			p.add(fields[i]);
+			fieldPanel.add(p);
+	    }
 		
-		/* Create panels for holding the fields.
-		 * To make it look nice, create an extra panel for holding all the child panels.
-		 */
-		Panel serverPanel = new Panel(new BorderLayout());
-		Panel fromPanel = new Panel(new BorderLayout());
-		Panel toPanel = new Panel(new BorderLayout());
-	        
-	    // add ccPanel and usrPanel to GUI
-	    Panel ccPanel = new Panel(new BorderLayout());
-	    Panel usrPanel = new Panel(new BorderLayout());
-	    Panel subjectPanel = new Panel(new BorderLayout());
-		Panel messagePanel = new Panel(new BorderLayout());
+/*
+		// Create panels for holding the fields.
+		JPanel serverPanel = new JPanel(new FlowLayout());
+		JPanel fromPanel = new JPanel(new FlowLayout());
+		JPanel toPanel = new JPanel(new BorderLayout());
+		JPanel ccPanel = new JPanel(new BorderLayout());
+	    JPanel usrPanel = new JPanel(new BorderLayout()); 	    
+	    JPanel subjectPanel = new JPanel(new BorderLayout());
+		JPanel messagePanel = new JPanel(new BorderLayout());
+
+		// Add labels to each panel
+	//	Dimension dServer = serverLabel.getPreferredSize();  
+	//  serverLabel.setPreferredSize(new Dimension(dServer.width+20,dServer.height)); 
 		serverPanel.add(serverLabel, BorderLayout.WEST);
 		serverPanel.add(serverField, BorderLayout.CENTER);
+		
+		Dimension dFrom = fromLabel.getPreferredSize();  
+	    fromLabel.setPreferredSize(new Dimension(dFrom.width+20,dFrom.height)); 
 		fromPanel.add(fromLabel, BorderLayout.WEST);
 		fromPanel.add(fromField, BorderLayout.CENTER);
+		
 		toPanel.add(toLabel, BorderLayout.WEST);
 		toPanel.add(toField, BorderLayout.CENTER);
-	        
-	    // Add ccLabel, ccField, & usrName to Panels
-	    ccPanel.add(ccLabel, BorderLayout.WEST);
+	    
+		ccPanel.add(ccLabel, BorderLayout.WEST);
 		ccPanel.add(ccField, BorderLayout.CENTER);
-	    usrPanel.add(usrName, BorderLayout.WEST);
-	        
-	    subjectPanel.add(subjectLabel, BorderLayout.WEST);
+	    
+		usrPanel.add(usrName, BorderLayout.WEST); // @todo pull email together from local variables
+	    
+		subjectPanel.add(subjectLabel, BorderLayout.WEST);
 		subjectPanel.add(subjectField, BorderLayout.CENTER);
+
 		messagePanel.add(messageLabel, BorderLayout.NORTH);	
 		messagePanel.add(messageText, BorderLayout.CENTER);
-		Panel fieldPanel = new Panel(new GridLayout(0, 1));
+
+		// Panel to hold all other panels
+		// @todo: add border
+		// @todo: add cellspacing
+		JPanel fieldPanel = new JPanel(new GridLayout(0, 1, 10, 10));
+		Border blackline = BorderFactory.createLineBorder(Color.black);
+		Border empty = BorderFactory.createEmptyBorder(20,20,20,20);
+		fieldPanel.setBorder(empty);
+	
 		fieldPanel.add(serverPanel);
 		fieldPanel.add(fromPanel);
 		fieldPanel.add(toPanel);
 	    fieldPanel.add(ccPanel);
 	    fieldPanel.add(usrPanel);
 	    fieldPanel.add(subjectPanel);
+	    fieldPanel.add(messagePanel);
 	
-		/* Create a panel for the buttons and add listeners to the
-		   buttons. */
-		Panel buttonPanel = new Panel(new GridLayout(1, 0));
+		// Create a panel for the buttons and add listeners to the buttons. 
+		JPanel buttonPanel = new JPanel(new GridLayout(1, 0));
+		buttonPanel.setBorder(empty);
 		btSend.addActionListener(new SendListener());
 		btClear.addActionListener(new ClearListener());
 		btQuit.addActionListener(new QuitListener());
@@ -107,17 +146,25 @@ public class MailClient extends Frame
 		buttonPanel.add(btClear);
 		buttonPanel.add(btQuit);
 		
-		/* Add, pack, and show. */
-		add(fieldPanel, BorderLayout.NORTH);
-		add(messagePanel, BorderLayout.CENTER);
-		add(buttonPanel, BorderLayout.SOUTH);
-		pack();
-		show();
+		// Add, pack, and show.
+		this.add(fieldPanel, BorderLayout.NORTH);
+		this.add(messagePanel, BorderLayout.CENTER);
+		this.add(buttonPanel, BorderLayout.SOUTH);
+//		this.add(rootPanel, BorderLayout.NORTH);
+ */
+	//	this.pack();
+		this.setVisible(true);
+		
     }
 
     static public void main(String argv[])
     {
-    	new MailClient();
+    	String[] labels = {
+    			"Local Mailserver:", "From:", "To:", "CC:", "Auto Generate?", "Subject"
+    	};
+    	int[] widths = {40, 40, 40, 40, 1, 40 };
+    	
+    	new MailClient(labels, widths);
     }
 
     /* Handler for the Send-button. */
@@ -207,5 +254,5 @@ public class MailClient extends Frame
 		{
 		    System.exit(0);
 		}
-    }
-}
+    }   
+}        
