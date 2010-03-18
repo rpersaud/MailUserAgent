@@ -14,10 +14,12 @@ package edu.gsu.cs.networks;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.text.*;
 
 /**
  * A simple mail client with a GUI for sending mail.
@@ -30,17 +32,26 @@ public class MailClient extends JFrame
     private Button btSend = new Button("Send");
     private Button btClear = new Button("Clear");
     private Button btQuit = new Button("Quit");
-    private JLabel serverLabel = new JLabel("Local mailserver:");
+    
+    private JLabel serverLabel = new JLabel("Local Mailserver:", Label.RIGHT);
     private JTextField serverField = new JTextField("", 40);
+    
     private JLabel fromLabel = new JLabel("From:");
     private JTextField fromField = new JTextField("", 40);
-    private Label toLabel = new Label("To:"); 
-    private TextField toField = new TextField("", 40);
+    
+    private JLabel toLabel = new JLabel("To:"); 
+    private JTextField toField = new JTextField("", 40);
     
     /* Cc Label & Text field from GUI */
     private Label ccLabel = new Label("cc:"); 
     private TextField ccField = new TextField("", 40);
     
+    // create constants for instantiating input elements
+    private final static int TEXTFIELD = 10;
+    private final static int TEXTAREA = 20;
+    
+    // private Vector<JTextComponent> fields = new Vector<JTextComponent>();
+    private JTextComponent[] fields;
     
     /* Check box to indicate is you want to Auto Generate the username
      * from the host name and local user id.
@@ -54,23 +65,75 @@ public class MailClient extends JFrame
     private TextField subjectField = new TextField("", 40);
     private Label messageLabel = new Label("Message:");
     private TextArea messageText = new TextArea(10, 40);
-
-    private JTextField[] fields;
     
     /**
      * Create a new MailClient window with fields for entering all
      * the relevant information (From, To, Subject, and message).
      */
-    public MailClient(String[] labels, int[] widths)
+    public MailClient(String[] labels, int[] inputs)
     {
 		super("Java Mailclient");
-    	this.setLayout(new BorderLayout());
 
+		// Setup frame
+    	this.setLayout(new BorderLayout());
+    	Border emptyBorder = new EmptyBorder(10, 10, 10, 10);
+	    this.setBounds(100, 100, 640, 400);
+	    this.setBackground(Color.cyan);
+	    this.setResizable(false);
+
+	    // Setup panels for labels, and fields
     	JPanel labelPanel = new JPanel(new GridLayout(labels.length, 1));
 	    JPanel fieldPanel = new JPanel(new GridLayout(labels.length, 1));
 	    add(labelPanel, BorderLayout.WEST);
 	    add(fieldPanel, BorderLayout.CENTER);
+	    labelPanel.setBorder(emptyBorder);
+	    fieldPanel.setBorder(emptyBorder);
 	    
+	    fields = new JTextComponent[labels.length];
+	    
+	    // Add localmail server label+field
+	    for (int i=0; i < labels.length; i++) {
+	    	// add labels
+	    	JLabel label = new JLabel(labels[i], Label.RIGHT);
+		    label.setVerticalTextPosition(JLabel.CENTER);
+
+		    fields[i] = new JTextField("",40);
+		    
+		    // fields.add(i, new JTextField("",40));
+		  	//label.setLabelFor(fields.get(i).);
+		  	
+		    labelPanel.add(label);
+	    	JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	   	    panel.add(fields[i]);
+	   	    fieldPanel.add(panel);
+	    }
+	//    JTextArea messageField = new JTextArea(10,40);
+	 //  fieldPanel.add(messageField);
+	    
+	    
+	    
+	    serverLabel.setVerticalTextPosition(JLabel.CENTER);
+	    labelPanel.add(serverLabel);
+	    JPanel serverPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    serverPanel.add(serverField);
+	    fieldPanel.add(serverPanel);
+	    
+	    // Add from label + field
+	    fromLabel.setVerticalTextPosition(JLabel.CENTER);
+	    labelPanel.add(fromLabel);
+	    JPanel fromPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    fromPanel.add(fromField);
+	    fieldPanel.add(fromPanel);
+
+	    // Add o label + field
+	    toLabel.setVerticalTextPosition(JLabel.CENTER);
+	    labelPanel.add(toLabel);
+	    JPanel toPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    toPanel.add(toField);
+	    fieldPanel.add(toPanel);
+
+	    
+	    /*
 	    fields = new JTextField[labels.length];
 	    for (int i = 0; i < labels.length; i += 1) {
 	    	fields[i] = new JTextField();
@@ -152,19 +215,16 @@ public class MailClient extends JFrame
 		this.add(buttonPanel, BorderLayout.SOUTH);
 //		this.add(rootPanel, BorderLayout.NORTH);
  */
-	//	this.pack();
+	    // Show frame
+		this.pack();
 		this.setVisible(true);
-		
     }
 
     static public void main(String argv[])
     {
-    	String[] labels = {
-    			"Local Mailserver:", "From:", "To:", "CC:", "Auto Generate?", "Subject"
-    	};
-    	int[] widths = {40, 40, 40, 40, 1, 40 };
-    	
-    	new MailClient(labels, widths);
+    	String[] labels = {"local mailserver:", "from:", "to:", "cc:", "subject:"};
+    	int[] inputs = {TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD};
+    	new MailClient(labels, inputs);
     }
 
     /* Handler for the Send-button. */
@@ -176,7 +236,8 @@ public class MailClient extends JFrame
 		    Envelope envelope;  // TRY IT HERE 
 		    
 		    /* Check that we have the local mailserver */
-		    if ((serverField.getText()).equals("")) {
+		    //if ((serverField.getText()).equals("")) {
+		    if (fields[0].getText().equals("")) {
 		    	System.out.println("Need name of local mailserver!");
 		    	return;
 		    }
@@ -205,7 +266,7 @@ public class MailClient extends JFrame
 		    			subjectField.getText(), 
 		    			messageText.getText(),
 		    			usrName.getState(),
-		    			serverField.getText());
+		    			fields[0].getText());//serverField.getText());
 	           
 		    	/* Check that the message is valid, i.e., sender and recipient addresses look ok. */
 		    	if (!mailMessage.isValid()) {
@@ -214,7 +275,7 @@ public class MailClient extends JFrame
 	
 		    	/* Create the envelope, open the connection and try to send the message. */
 		    	try {
-		    		envelope = new Envelope(mailMessage, serverField.getText());
+		    		envelope = new Envelope(mailMessage, fields[0].getText());//serverField.getText());
 		    	} catch (UnknownHostException e) {
 		    		/* If there is an error, do not go further */
 		    		return;
