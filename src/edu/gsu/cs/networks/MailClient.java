@@ -43,8 +43,8 @@ public class MailClient extends JFrame
     private JTextField toField = new JTextField("", 40);
     
     /* Cc Label & Text field from GUI */
-    private Label ccLabel = new Label("cc:"); 
-    private TextField ccField = new TextField("", 40);
+    private JLabel ccLabel = new JLabel("cc:"); 
+    private JTextField ccField = new JTextField("", 40);
     
     // create constants for instantiating input elements
     private final static int TEXTFIELD = 10;
@@ -61,10 +61,12 @@ public class MailClient extends JFrame
      * name that can identify your username.
      */
     private Checkbox usrName = new Checkbox("Auto Generate?"); 
-    private Label subjectLabel = new Label("Subject:");
-    private TextField subjectField = new TextField("", 40);
-    private Label messageLabel = new Label("Message:");
-    private TextArea messageText = new TextArea(10, 40);
+    
+    private JLabel subjectLabel = new JLabel("Subject:");
+    private JTextField subjectField = new JTextField("", 40);
+    
+    private JLabel messageLabel = new JLabel("Message:");
+    private JTextArea messageText = new JTextArea(40,10);
     
     /**
      * Create a new MailClient window with fields for entering all
@@ -88,9 +90,11 @@ public class MailClient extends JFrame
 	    add(fieldPanel, BorderLayout.CENTER);
 	    labelPanel.setBorder(emptyBorder);
 	    fieldPanel.setBorder(emptyBorder);
-	    
+
+	    /*
+	     * @todo reduce the number of steps to render the gui
+	     /
 	    fields = new JTextComponent[labels.length];
-	    
 	    // Add localmail server label+field
 	    for (int i=0; i < labels.length; i++) {
 	    	// add labels
@@ -107,33 +111,57 @@ public class MailClient extends JFrame
 	   	    panel.add(fields[i]);
 	   	    fieldPanel.add(panel);
 	    }
-	//    JTextArea messageField = new JTextArea(10,40);
-	 //  fieldPanel.add(messageField);
-	    
-	    
-	    
+	    */
+
+	    // Add "local mailserver" label + field
 	    serverLabel.setVerticalTextPosition(JLabel.CENTER);
 	    labelPanel.add(serverLabel);
 	    JPanel serverPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 	    serverPanel.add(serverField);
 	    fieldPanel.add(serverPanel);
 	    
-	    // Add from label + field
+	    // Add "from" label + field
 	    fromLabel.setVerticalTextPosition(JLabel.CENTER);
 	    labelPanel.add(fromLabel);
 	    JPanel fromPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 	    fromPanel.add(fromField);
 	    fieldPanel.add(fromPanel);
 
-	    // Add o label + field
+	    // Add "To" label + field
 	    toLabel.setVerticalTextPosition(JLabel.CENTER);
 	    labelPanel.add(toLabel);
 	    JPanel toPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 	    toPanel.add(toField);
 	    fieldPanel.add(toPanel);
-
 	    
+	    // Add "CC" label + field
+	    ccLabel.setVerticalTextPosition(JLabel.CENTER);
+	    labelPanel.add(ccLabel);
+	    JPanel ccPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    ccPanel.add(ccField);
+	    fieldPanel.add(ccPanel);
+
+	    // Add "subject" label + field
+	    subjectLabel.setVerticalTextPosition(JLabel.CENTER);
+	    labelPanel.add(subjectLabel);
+	    JPanel subjectPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    subjectPanel.add(subjectField);
+	    fieldPanel.add(subjectPanel);
+
+	    // Add "message" label + field
 	    /*
+	     * @todo unable to get the textarea to display without messing 
+	     * up the rest of the ui
+	     * 
+	    messageLabel.setVerticalTextPosition(JLabel.CENTER);
+	    labelPanel.add(messageLabel);
+	    JPanel messagePanel = new JPanel();//new FlowLayout(FlowLayout.LEFT));
+	    messagePanel.add(messageText);
+	    fieldPanel.add(messagePanel);
+	    */
+	    /*
+	     * @note codeblock off website to dynamically render fields based on array  
+	     /
 	    fields = new JTextField[labels.length];
 	    for (int i = 0; i < labels.length; i += 1) {
 	    	fields[i] = new JTextField();
@@ -147,8 +175,11 @@ public class MailClient extends JFrame
 			p.add(fields[i]);
 			fieldPanel.add(p);
 	    }
-		
-/*
+		*/
+	    
+	    /*
+	     * Original code as supplied by file author
+	     * 
 		// Create panels for holding the fields.
 		JPanel serverPanel = new JPanel(new FlowLayout());
 		JPanel fromPanel = new JPanel(new FlowLayout());
@@ -159,8 +190,8 @@ public class MailClient extends JFrame
 		JPanel messagePanel = new JPanel(new BorderLayout());
 
 		// Add labels to each panel
-	//	Dimension dServer = serverLabel.getPreferredSize();  
-	//  serverLabel.setPreferredSize(new Dimension(dServer.width+20,dServer.height)); 
+		// Dimension dServer = serverLabel.getPreferredSize();  
+		// serverLabel.setPreferredSize(new Dimension(dServer.width+20,dServer.height)); 
 		serverPanel.add(serverLabel, BorderLayout.WEST);
 		serverPanel.add(serverField, BorderLayout.CENTER);
 		
@@ -213,8 +244,8 @@ public class MailClient extends JFrame
 		this.add(fieldPanel, BorderLayout.NORTH);
 		this.add(messagePanel, BorderLayout.CENTER);
 		this.add(buttonPanel, BorderLayout.SOUTH);
-//		this.add(rootPanel, BorderLayout.NORTH);
- */
+		// this.add(rootPanel, BorderLayout.NORTH);
+	     */
 	    // Show frame
 		this.pack();
 		this.setVisible(true);
